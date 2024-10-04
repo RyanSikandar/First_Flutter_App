@@ -1,7 +1,16 @@
+import 'package:coffee_app/isar_db/coffee.dart';
 import 'package:flutter/material.dart';
 import 'home.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final dir = await getApplicationDocumentsDirectory();
+  final isar = await Isar.open(
+    [CoffeeSchema],
+    directory: dir.path,
+  );
   runApp(const MaterialApp(
     home: Home(),
   ));
