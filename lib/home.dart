@@ -1,5 +1,4 @@
 import 'package:coffee_app/coffee_prefs.dart';
-import 'package:coffee_app/main.dart';
 import 'package:coffee_app/styled_body_text.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

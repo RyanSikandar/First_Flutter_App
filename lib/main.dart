@@ -1,12 +1,24 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:coffee_app/isar_db/coffee.dart';
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:go_router/go_router.dart';
 
 void main() async {
+  await AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+        channelKey: "basic_channel",
+        channelName: "basic notification",
+        channelDescription: "Test notification channel",
+        channelGroupKey: "basic_channel_group")
+  ], channelGroups: [
+    NotificationChannelGroup(
+      channelGroupKey: "basic_channel_group",
+      channelGroupName: "basic channel group",
+    )
+  ]);
   WidgetsFlutterBinding.ensureInitialized();
   final dir = await getApplicationDocumentsDirectory();
   final isar = await Isar.open(
