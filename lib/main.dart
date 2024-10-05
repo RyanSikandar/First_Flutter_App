@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:coffee_app/isar_db/coffee.dart';
+import 'package:coffee_app/notification_controller.dart';
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'package:isar/isar.dart';
@@ -19,6 +20,13 @@ void main() async {
       channelGroupName: "basic channel group",
     )
   ]);
+
+  bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+
+  if (!isAllowed) {
+    await AwesomeNotifications().requestPermissionToSendNotifications();
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
   final dir = await getApplicationDocumentsDirectory();
   final isar = await Isar.open(
@@ -48,8 +56,27 @@ final _router = GoRouter(
   ],
 );
 
-class Sandbox extends StatelessWidget {
+class Sandbox extends StatefulWidget {
   const Sandbox({super.key});
+
+  @override
+  State<Sandbox> createState() => _SandboxState();
+}
+
+class _SandboxState extends State<Sandbox> {
+  @override
+  void initState() {
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod:
+            NotificationController.onNotificationReceivedMethod,
+        onNotificationCreatedMethod:
+            NotificationController.onNotificationCreatedMethod,
+        onNotificationDisplayedMethod:
+            NotificationController.onNotificationDisplayedMethod,
+        onDismissActionReceivedMethod:
+            NotificationController.onNotificationDismissedMethod);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,13 +93,79 @@ class SecondScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Second Screen'),
+        title: const Text('Local Notifications'),
+        backgroundColor: Colors.amber,
       ),
-      body: const Placeholder(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const FlutterLogo(
+              size: 100,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Local Notifications',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 40),
+            NotificationButton(
+              icon: Icons.notifications,
+              label: 'Simple Notification',
+              onPressed: () {
+                AwesomeNotifications().createNotification(
+                    content: NotificationContent(
+                        id: 1,
+                        channelKey: 'basic_channel',
+                        title: "Simple Notification",
+                        body: "Simple body"));
+              },
+            ),
+           
+          ],
+        ),
+      ),
     );
   }
 }
 
+class NotificationButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  const NotificationButton({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 24),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+  }
+}
 //Sample code for rows
  // return Scaffold(
     //     appBar: AppBar(
